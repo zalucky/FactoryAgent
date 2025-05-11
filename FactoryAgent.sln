@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35828.75 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FactoryAgent", "FactoryAgent\FactoryAgent.csproj", "{845AC984-3386-41F3-B366-58ADA6F19ECB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{845AC984-3386-41F3-B366-58ADA6F19ECB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{845AC984-3386-41F3-B366-58ADA6F19ECB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{845AC984-3386-41F3-B366-58ADA6F19ECB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{845AC984-3386-41F3-B366-58ADA6F19ECB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9D5745F4-78A4-45CF-90E2-C0D923D101A5}
+	EndGlobalSection
+EndGlobal
