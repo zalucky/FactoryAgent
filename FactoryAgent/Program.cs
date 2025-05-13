@@ -1,11 +1,25 @@
 ﻿using FactoryAgent.Services;
+using Microsoft.Extensions.Configuration;
+using FactoryAgent.Models;
 
 class Program
 {
     static async Task Main(string[] args)
-    {
-        var endpoint = "opc.tcp://localhost:4840";
-        var deviceNames = new[] { "Device 1", "Device 2" };
+    {        
+        var config = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json")
+            .Build();
+
+        var endpoint = config["OpcUa:Endpoint"];
+        
+        var devices = config.GetSection("IoTHub")
+            .GetChildren()
+            .Select(section => new DeviceConfig
+            {
+                Name = section.Key,
+                ConnectionString = section.Value
+            })
+            .ToList();
 
         var reader = new OpcUaReader(endpoint);
 
@@ -14,25 +28,23 @@ class Program
             reader.Connect();
             Console.WriteLine("Connected with OPC UA Server");
 
-            var connectionStrings = new[]
-            {
-                    "CONNECTION STRING",
-                    "CONNECTION STRING"
-            };
-            var senders = deviceNames
-                .Select((name, index) => new { Name = name, Sender = new IoTHubSender(connectionStrings[index]) })
-                .ToDictionary(x => x.Name, x => x.Sender);
+            var senders = devices.ToDictionary(
+                d => d.Name,
+                d => new IoTHubSender(d.ConnectionString)
+            );
+
+            var previousErrors = devices.ToDictionary(d => d.Name, d => -1);
 
             while (true)
             {
-                foreach (var device in deviceNames)
+                foreach (var device in devices.Select(d => d.Name))
                 {
                     var data = reader.ReadDevice(device);
                     Console.WriteLine($"[{DateTime.Now}] {device}: Status={data.ProductionStatus}, ...");
                     await senders[device].SendDataAsync(data);
                 }
 
-                Thread.Sleep(5000); // odczyt co 5 sekund
+                Thread.Sleep(5000);
             }
         }
         catch (Exception ex)
