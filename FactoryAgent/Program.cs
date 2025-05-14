@@ -41,9 +41,23 @@ class Program
                 {
                     var data = reader.ReadDevice(device);
                     Console.WriteLine($"[{DateTime.Now}] {device}: Status={data.ProductionStatus}, ...");
-                    await senders[device].SendDataAsync(data);
-                }
+                    
+                    // dane telemetryczne
+                    await senders[device].SendDataAsync(data); 
 
+                    // device twin
+                    var desiredRate = await senders[device].GetDesiredProductionRateAsync();
+                    if (desiredRate.HasValue)
+                    {
+                        Console.WriteLine($"[TWIN] Desired Production Rate for {device}: {desiredRate.Value}%");
+                        if (reader.ReadDevice(device).ProductionRate != desiredRate.Value)
+                        {
+                            reader.WriteProductionRate(device, desiredRate.Value);
+                            await senders[device].UpdateReportedProductionRateAsync(desiredRate.Value);
+                        }
+                    }
+                    await senders[device].UpdateReportedProductionRateAsync(data.ProductionRate);
+                }
                 Thread.Sleep(5000);
             }
         }

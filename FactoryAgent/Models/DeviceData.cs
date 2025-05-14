@@ -8,5 +8,6 @@
         public int GoodCount { get; set; }
         public int BadCount { get; set; }
         public double Temperature { get; set; }
+        public int ProductionRate { get; set; }
     }
 }

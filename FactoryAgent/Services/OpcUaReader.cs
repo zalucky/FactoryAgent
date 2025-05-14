@@ -42,6 +42,12 @@ namespace FactoryAgent.Services
                 Temperature = Convert.ToDouble(temperature)
             };
         }
+
+        public void WriteProductionRate(string deviceName, int value)
+        {
+            var nodeId = $"ns=2;s={deviceName}/ProductionRate";
+            client.WriteNode(nodeId, value);
+        }
     }
 }
 

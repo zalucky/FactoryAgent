@@ -2,6 +2,7 @@
 using Microsoft.Azure.Devices.Client;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Azure.Devices.Shared;
 
 namespace FactoryAgent.Services
 {
@@ -23,6 +24,23 @@ namespace FactoryAgent.Services
 
             await deviceClient.SendEventAsync(message);
             Console.WriteLine($"Data sent to IoT Hub: {messageString}");
+        }
+
+        public async Task<int?> GetDesiredProductionRateAsync()
+        {
+            var twin = await deviceClient.GetTwinAsync();
+            if (twin.Properties.Desired.Contains("ProductionRate"))
+            {
+                return twin.Properties.Desired["ProductionRate"];
+            }
+            return null;
+        }
+        public async Task UpdateReportedProductionRateAsync(int rate)
+        {
+            var reportedProperties = new TwinCollection();
+            reportedProperties["ProductionRate"] = rate;
+            await deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
+            Console.WriteLine($"Zaktualizowano Reported Property: ProductionRate = {rate}");
         }
     }
 }
