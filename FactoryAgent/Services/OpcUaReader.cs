@@ -31,6 +31,8 @@ namespace FactoryAgent.Services
             var goodCount = client.ReadNode($"{prefix}/GoodCount").Value;
             var badCount = client.ReadNode($"{prefix}/BadCount").Value;
             var temperature = client.ReadNode($"{prefix}/Temperature").Value;
+            var productionRate = client.ReadNode($"{prefix}/ProductionRate").Value;
+            var deviceErrors = client.ReadNode($"{prefix}/DeviceError").Value;
 
             return new DeviceData
             {
@@ -39,7 +41,9 @@ namespace FactoryAgent.Services
                 WorkorderId = workorderId?.ToString(),
                 GoodCount = Convert.ToInt32(goodCount),
                 BadCount = Convert.ToInt32(badCount),
-                Temperature = Convert.ToDouble(temperature)
+                Temperature = Convert.ToDouble(temperature),
+                ProductionRate = Convert.ToInt32(productionRate),
+                DeviceErrors = Convert.ToInt32(deviceErrors)
             };
         }
 

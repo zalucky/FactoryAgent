@@ -40,7 +40,15 @@ namespace FactoryAgent.Services
             var reportedProperties = new TwinCollection();
             reportedProperties["ProductionRate"] = rate;
             await deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
-            Console.WriteLine($"Zaktualizowano Reported Property: ProductionRate = {rate}");
+            Console.WriteLine($"Updated Reported Property: ProductionRate = {rate}");
+        }
+
+        public async Task UpdateReportedDeviceErrorsAsync(int errorCode)
+        {
+            var reported = new TwinCollection();
+            reported["DeviceErrors"] = errorCode;
+            await deviceClient.UpdateReportedPropertiesAsync(reported);
+            Console.WriteLine($"Updated Reported Property: DeviceErrors = {errorCode}");
         }
     }
 }

@@ -57,6 +57,14 @@ class Program
                         }
                     }
                     await senders[device].UpdateReportedProductionRateAsync(data.ProductionRate);
+
+                    // DeviceErrors
+                    if (previousErrors[device] != data.DeviceErrors)
+                    {
+                        await senders[device].UpdateReportedDeviceErrorsAsync(data.DeviceErrors);
+                        previousErrors[device] = data.DeviceErrors;
+                    }
+                    Console.WriteLine($"[{DateTime.Now}] {device}: Errors={data.DeviceErrors}");
                 }
                 Thread.Sleep(5000);
             }

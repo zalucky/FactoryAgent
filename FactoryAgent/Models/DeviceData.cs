@@ -9,5 +9,6 @@
         public int BadCount { get; set; }
         public double Temperature { get; set; }
         public int ProductionRate { get; set; }
+        public int DeviceErrors { get; set; }
     }
 }
