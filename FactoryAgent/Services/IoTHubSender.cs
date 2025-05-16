@@ -50,5 +50,13 @@ namespace FactoryAgent.Services
             await deviceClient.UpdateReportedPropertiesAsync(reported);
             Console.WriteLine($"Updated Reported Property: DeviceErrors = {errorCode}");
         }
+
+        public void SetMethodHandler(Func<string, Task<MethodResponse>> handler, string methodName)
+        {
+            deviceClient.SetMethodHandlerAsync(methodName, async (request, context) =>
+            {
+                return await handler(request.DataAsJson);
+            }, null);
+        }
     }
 }

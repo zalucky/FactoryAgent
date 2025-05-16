@@ -1,4 +1,5 @@
 ﻿using FactoryAgent.Models;
+using Opc.UaFx;
 using Opc.UaFx.Client;
 
 namespace FactoryAgent.Services
@@ -51,6 +52,16 @@ namespace FactoryAgent.Services
         {
             var nodeId = $"ns=2;s={deviceName}/ProductionRate";
             client.WriteNode(nodeId, value);
+        }
+
+        // EmergencyStop, ResetErrorStatus
+        public void CallMethod(string deviceName, string methodName)
+        {
+            var methodNodeId = $"ns=2;s={deviceName}/{methodName}";
+            var objectNodeId = $"ns=2;s={deviceName}";
+
+            client.CallMethod(objectNodeId, methodNodeId);
+            Console.WriteLine($"The OPC UA method has been called: {deviceName}/{methodName}");
         }
     }
 }

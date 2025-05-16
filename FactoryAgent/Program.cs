@@ -1,6 +1,7 @@
 ﻿using FactoryAgent.Services;
 using Microsoft.Extensions.Configuration;
 using FactoryAgent.Models;
+using Microsoft.Azure.Devices.Client;
 
 class Program
 {
@@ -65,6 +66,23 @@ class Program
                         previousErrors[device] = data.DeviceErrors;
                     }
                     Console.WriteLine($"[{DateTime.Now}] {device}: Errors={data.DeviceErrors}");
+
+                    // EmergencyStop + ResetErrorStatus
+                    var sender = senders[device];
+
+                    // EmergencyStop
+                    sender.SetMethodHandler(async (payload) =>
+                    {
+                        reader.CallMethod(device, "EmergencyStop");
+                        return new MethodResponse(200);
+                    }, "EmergencyStop");
+
+                    // ResetErrorStatus
+                    sender.SetMethodHandler(async (payload) =>
+                    {
+                        reader.CallMethod(device, "ResetErrorStatus");
+                        return new MethodResponse(200);
+                    }, "ResetErrorStatus");
                 }
                 Thread.Sleep(5000);
             }
