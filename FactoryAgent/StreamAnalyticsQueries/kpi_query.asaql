@@ -1,0 +1,12 @@
+SELECT
+  DeviceName,
+  System.Timestamp AS WindowEnd,
+  SUM(GoodCount) AS TotalGood,
+  SUM(GoodCount + BadCount) AS TotalProduced,
+  CASE 
+    WHEN SUM(GoodCount + BadCount) = 0 THEN 0
+    ELSE 100.0 * SUM(GoodCount) / SUM(GoodCount + BadCount)
+  END AS GoodPercentage
+INTO [kpioutputblob]
+FROM [iot-hub-input-factory]
+GROUP BY TumblingWindow(minute, 5), DeviceName
