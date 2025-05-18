@@ -1,0 +1,9 @@
+SELECT
+  DeviceName,
+  AVG(Temperature) AS AvgTemp,
+  MIN(Temperature) AS MinTemp,
+  MAX(Temperature) AS MaxTemp,
+  System.Timestamp AS WindowEnd
+INTO [temperatureoutputblob]
+FROM [iot-hub-input-factory]
+GROUP BY HoppingWindow(minute, 5, 1), DeviceName

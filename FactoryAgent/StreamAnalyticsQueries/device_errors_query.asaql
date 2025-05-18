@@ -1,0 +1,9 @@
+SELECT
+  DeviceName,
+  COUNT(*) AS ErrorCount,
+  System.Timestamp AS DetectedAt
+INTO [deviceerrorsoutputblob]
+FROM [iot-hub-input-factory]
+WHERE DeviceErrors > 0
+GROUP BY TumblingWindow(minute, 1), DeviceName
+HAVING COUNT(*) > 3
