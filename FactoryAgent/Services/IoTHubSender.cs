@@ -15,7 +15,7 @@ namespace FactoryAgent.Services
             deviceClient = DeviceClient.CreateFromConnectionString(connectionString, TransportType.Mqtt);
         }
 
-        public async Task SendDataAsync(DeviceData data)
+        public async Task SendDataAsync(object data)
         {
             var messageString = JsonSerializer.Serialize(data);
             var message = new Message(Encoding.UTF8.GetBytes(messageString));

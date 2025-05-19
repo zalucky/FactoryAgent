@@ -5,5 +5,5 @@ SELECT
   MAX(Temperature) AS MaxTemp,
   System.Timestamp AS WindowEnd
 INTO [temperatureoutputblob]
-FROM [iot-hub-input-factory]
+FROM [iot-hub-input-factory] TIMESTAMP BY EventEnqueuedUtcTime
 GROUP BY HoppingWindow(minute, 5, 1), DeviceName

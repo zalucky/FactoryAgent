@@ -35,6 +35,8 @@ class Program
             );
 
             var previousErrors = devices.ToDictionary(d => d.Name, d => -1);
+            var previousGoodCounts = devices.ToDictionary(d => d.Name, d => 0);
+            var previousBadCounts = devices.ToDictionary(d => d.Name, d => 0);
 
             while (true)
             {
@@ -42,9 +44,29 @@ class Program
                 {
                     var data = reader.ReadDevice(device);
                     Console.WriteLine($"[{DateTime.Now}] {device}: Status={data.ProductionStatus}, ...");
-                    
+                    int goodDelta = data.GoodCount - previousGoodCounts[device];
+                    int badDelta = data.BadCount - previousBadCounts[device];
+
+                    previousGoodCounts[device] = data.GoodCount;
+                    previousBadCounts[device] = data.BadCount;
+
+                    var payload = new
+                    {
+                        data.DeviceName,
+                        data.ProductionStatus,
+                        data.WorkorderId,
+                        data.Temperature,
+                        data.ProductionRate,
+                        data.DeviceErrors,
+                        data.GoodCount,
+                        data.BadCount,
+                        GoodDelta = goodDelta,
+                        BadDelta = badDelta,
+                        Timestamp = DateTime.UtcNow
+                    };
+
                     // dane telemetryczne
-                    await senders[device].SendDataAsync(data); 
+                    await senders[device].SendDataAsync(payload); 
 
                     // device twin
                     var desiredRate = await senders[device].GetDesiredProductionRateAsync();
