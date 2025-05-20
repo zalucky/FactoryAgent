@@ -27,7 +27,7 @@ class Program
         try
         {
             reader.Connect();
-            Console.WriteLine("Connected with OPC UA Server");
+            Logger.Success("Connected with OPC UA Server");
 
             var senders = devices.ToDictionary(
                 d => d.Name,
@@ -38,12 +38,32 @@ class Program
             var previousGoodCounts = devices.ToDictionary(d => d.Name, d => 0);
             var previousBadCounts = devices.ToDictionary(d => d.Name, d => 0);
 
+            // EmergencyStop + ResetErrorStatus
+            foreach (var device in devices.Select(d => d.Name))
+            {
+                var sender = senders[device];
+
+                sender.SetMethodHandler(async (_) =>
+                {
+                    reader.CallMethod(device, "EmergencyStop");
+                    Logger.Warn("EmergencyStop called via IoT Hub", device);
+                    return new MethodResponse(200);
+                }, "EmergencyStop");
+
+                sender.SetMethodHandler(async (_) =>
+                {
+                    reader.CallMethod(device, "ResetErrorStatus");
+                    Logger.Warn("ResetErrorStatus called via IoT Hub", device);
+                    return new MethodResponse(200);
+                }, "ResetErrorStatus");
+            }
+
             while (true)
             {
                 foreach (var device in devices.Select(d => d.Name))
                 {
                     var data = reader.ReadDevice(device);
-                    Console.WriteLine($"[{DateTime.Now}] {device}: Status={data.ProductionStatus}, ...");
+                    Logger.Info($"{device}: Status={data.ProductionStatus}, Temp={data.Temperature}°C, Errors={data.DeviceErrors}");
                     int goodDelta = data.GoodCount - previousGoodCounts[device];
                     int badDelta = data.BadCount - previousBadCounts[device];
 
@@ -72,11 +92,11 @@ class Program
                     var desiredRate = await senders[device].GetDesiredProductionRateAsync();
                     if (desiredRate.HasValue)
                     {
-                        Console.WriteLine($"[TWIN] Desired Production Rate for {device}: {desiredRate.Value}%");
+                        Logger.Info($"[TWIN] Desired Production Rate for {device}: {desiredRate.Value}%");
                         if (reader.ReadDevice(device).ProductionRate != desiredRate.Value)
                         {
                             reader.WriteProductionRate(device, desiredRate.Value);
-                            await senders[device].UpdateReportedProductionRateAsync(desiredRate.Value);
+                            Logger.Warn($"Updated {device} Production Rate from {data.ProductionRate} to {desiredRate.Value}");
                         }
                     }
                     await senders[device].UpdateReportedProductionRateAsync(data.ProductionRate);
@@ -87,24 +107,7 @@ class Program
                         await senders[device].UpdateReportedDeviceErrorsAsync(data.DeviceErrors);
                         previousErrors[device] = data.DeviceErrors;
                     }
-                    Console.WriteLine($"[{DateTime.Now}] {device}: Errors={data.DeviceErrors}");
-
-                    // EmergencyStop + ResetErrorStatus
-                    var sender = senders[device];
-
-                    // EmergencyStop
-                    sender.SetMethodHandler(async (payload) =>
-                    {
-                        reader.CallMethod(device, "EmergencyStop");
-                        return new MethodResponse(200);
-                    }, "EmergencyStop");
-
-                    // ResetErrorStatus
-                    sender.SetMethodHandler(async (payload) =>
-                    {
-                        reader.CallMethod(device, "ResetErrorStatus");
-                        return new MethodResponse(200);
-                    }, "ResetErrorStatus");
+                    Logger.Info($"[{DateTime.Now}] {device}: Errors={data.DeviceErrors}");
                 }
                 Thread.Sleep(5000);
             }
