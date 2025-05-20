@@ -22,7 +22,8 @@
             {
                 Console.ForegroundColor = color;
                 var devicePart = device != null ? $"[{device}]" : "";
-                Console.WriteLine($"[{level}] {DateTime.Now:HH:mm:ss} {devicePart} {message}");
+                //Console.WriteLine($"[{level}] {DateTime.Now:HH:mm:ss} {devicePart} {message}");
+                Console.WriteLine($"[{level}] {DateTime.Now:HH:mm:ss}" + (device != null ? $" [{device}]" : "") + $" {message}");
                 Console.ResetColor();
             }
         }

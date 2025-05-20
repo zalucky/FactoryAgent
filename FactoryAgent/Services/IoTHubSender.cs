@@ -1,4 +1,4 @@
-﻿using FactoryAgent.Models;
+﻿using FactoryAgent.Services;
 using Microsoft.Azure.Devices.Client;
 using System.Text;
 using System.Text.Json;
@@ -23,7 +23,7 @@ namespace FactoryAgent.Services
             message.ContentEncoding = "utf-8";
 
             await deviceClient.SendEventAsync(message);
-            Console.WriteLine($"Data sent to IoT Hub: {messageString}");
+            Logger.Info($"Data sent to IoT Hub: {messageString}", "TELEMETRY");
         }
 
         public async Task<int?> GetDesiredProductionRateAsync()
@@ -35,20 +35,20 @@ namespace FactoryAgent.Services
             }
             return null;
         }
-        public async Task UpdateReportedProductionRateAsync(int rate)
+        public async Task UpdateReportedProductionRateAsync(int rate, string deviceName)
         {
             var reportedProperties = new TwinCollection();
             reportedProperties["ProductionRate"] = rate;
             await deviceClient.UpdateReportedPropertiesAsync(reportedProperties);
-            Console.WriteLine($"Updated Reported Property: ProductionRate = {rate}");
+            Logger.Info($"Updated Reported Property: ProductionRate = {rate}", deviceName);
         }
 
-        public async Task UpdateReportedDeviceErrorsAsync(int errorCode)
+        public async Task UpdateReportedDeviceErrorsAsync(int errorCode, string deviceName)
         {
             var reported = new TwinCollection();
             reported["DeviceErrors"] = errorCode;
             await deviceClient.UpdateReportedPropertiesAsync(reported);
-            Console.WriteLine($"Updated Reported Property: DeviceErrors = {errorCode}");
+            Logger.Info($"Updated Reported Property: DeviceErrors = {errorCode}", deviceName);
         }
 
         public void SetMethodHandler(Func<string, Task<MethodResponse>> handler, string methodName)

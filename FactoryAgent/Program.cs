@@ -63,7 +63,7 @@ class Program
                 foreach (var device in devices.Select(d => d.Name))
                 {
                     var data = reader.ReadDevice(device);
-                    Logger.Info($"{device}: Status={data.ProductionStatus}, Temp={data.Temperature}°C, Errors={data.DeviceErrors}");
+                    Logger.Info($"[{device}]: Status={data.ProductionStatus}, Temp={data.Temperature}°C, Errors={data.DeviceErrors}");
                     int goodDelta = data.GoodCount - previousGoodCounts[device];
                     int badDelta = data.BadCount - previousBadCounts[device];
 
@@ -99,15 +99,15 @@ class Program
                             Logger.Warn($"Updated {device} Production Rate from {data.ProductionRate} to {desiredRate.Value}");
                         }
                     }
-                    await senders[device].UpdateReportedProductionRateAsync(data.ProductionRate);
+                    await senders[device].UpdateReportedProductionRateAsync(data.ProductionRate, data.DeviceName);
 
                     // DeviceErrors
                     if (previousErrors[device] != data.DeviceErrors)
                     {
-                        await senders[device].UpdateReportedDeviceErrorsAsync(data.DeviceErrors);
+                        await senders[device].UpdateReportedDeviceErrorsAsync(data.DeviceErrors, data.DeviceName);
                         previousErrors[device] = data.DeviceErrors;
                     }
-                    Logger.Info($"[{DateTime.Now}] {device}: Errors={data.DeviceErrors}");
+                    Logger.Info($"[{device}]: Errors={data.DeviceErrors}");
                 }
                 Thread.Sleep(5000);
             }
