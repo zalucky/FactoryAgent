@@ -1,6 +1,7 @@
 ﻿using FactoryAgent.Models;
 using Opc.UaFx;
 using Opc.UaFx.Client;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FactoryAgent.Services
 {
@@ -61,7 +62,8 @@ namespace FactoryAgent.Services
             var objectNodeId = $"ns=2;s={deviceName}";
 
             client.CallMethod(objectNodeId, methodNodeId);
-            Console.WriteLine($"The OPC UA method has been called: {deviceName}/{methodName}");
+            //Console.WriteLine($"The OPC UA method has been called: {deviceName}/{methodName}");
+            Logger.Info($"The OPC UA method has been called: {methodName}", deviceName);
         }
     }
 }
